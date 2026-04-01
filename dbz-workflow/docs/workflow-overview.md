@@ -16,7 +16,7 @@ dbz-workflow プラグインに含まれるエージェント集。
 | エージェント | 用途 | 使用フェーズ |
 |-------------|------|-------------|
 | `config-wizard` | 対話式設定ファイル生成 | /dbz-init |
-| `implementer` | スコープ内で最高品質の実装 | Phase 1, 4A/4B |
+| `implementer` | スコープ内で最高品質の実装 | Phase 0.5, 1, 4A/4B |
 | `reviewer` | 厳格なコードレビュー（8観点） | Phase 4A |
 | `plan-reviewer` | 実装計画レビュー（7観点） | /dbz-plan Phase 4 |
 | `audit-doc` | ドキュメント整合性監査 | Phase 4B |
