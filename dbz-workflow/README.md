@@ -177,6 +177,12 @@ touch .claude/dbz-workflow.config.md
 - 真偽値は `true`/`false` で記述すること
 - 理由: 環境やフォントによって表示が崩れる可能性があるため
 
+## ドキュメント
+
+| ドキュメント | 説明 |
+|-------------|------|
+| [Hooks 活用ガイド](docs/hooks-guide.md) | Hooks のテンプレートと活用方法 |
+
 ## アンインストール
 
 ```bash
