@@ -47,5 +47,4 @@ claude plugin update piwf@mediowl-plugins --scope project
   marketplace.json       # マーケットプレイス定義
 dbz-workflow/            # dbz-workflow プラグイン
 piwf/                    # piwf プラグイン
-shared/                  # プラグイン共通スクリプト
 ```
