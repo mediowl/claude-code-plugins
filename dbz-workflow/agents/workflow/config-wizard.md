@@ -106,7 +106,53 @@ AskUserQuestion:
   questionType: "freeform"
 ```
 
-**質問3: ペルソナ有効化**
+**質問3: Hooks テンプレート導入**
+```yaml
+AskUserQuestion:
+  question: |
+    Hooks テンプレートを導入しますか？（Write/Edit後の自動フォーマット、機密情報の書き込み防止）
+    a) すべて導入（auto-format + security-scan）
+    b) 選択して導入
+    c) 導入しない
+  questionType: "freeform"
+```
+
+**「b) 選択して導入」を選択した場合**:
+
+各 Hooks テンプレートについて一問一答で質問（計2回の AskUserQuestion 呼び出し）：
+
+```yaml
+AskUserQuestion:
+  question: |
+    PostToolUse: auto-format（Write/Edit 後にフォーマッター自動実行）を導入しますか？
+    a) 導入する
+    b) 導入しない
+  questionType: "freeform"
+```
+
+```yaml
+AskUserQuestion:
+  question: |
+    PreToolUse: security-scan（機密情報の書き込み防止）を導入しますか？
+    a) 導入する
+    b) 導入しない
+  questionType: "freeform"
+```
+
+**Hooks テンプレート導入時の動作**:
+
+1. `.claude/hooks/` ディレクトリを作成: `mkdir -p .claude/hooks`
+2. 選択されたテンプレートのスクリプトファイルを `.claude/hooks/` に生成
+3. スクリプトに実行権限を付与: `chmod +x .claude/hooks/*.sh`
+4. `.claude/settings.json` に hooks 設定を追記（既存設定がある場合はマージ）
+
+**生成されるファイル**:
+- `auto-format` 選択時: `.claude/hooks/auto-format.sh`
+- `security-scan` 選択時: `.claude/hooks/security-scan.sh`
+
+スクリプトの内容は `docs/hooks-guide.md` のテンプレートに準拠する。
+
+**質問4: ペルソナ有効化**
 ```yaml
 AskUserQuestion:
   question: |
@@ -507,6 +553,13 @@ AskUserQuestion:
 | audit-link | {true/false} | {備考} |
 | audit-test | {true/false} | {備考} |
 
+## Hooks 設定
+
+| Hook | 有効 | 説明 |
+|------|------|------|
+| auto-format | {true/false} | Write/Edit 後にフォーマッター自動実行 |
+| security-scan | {true/false} | 機密情報の書き込み防止 |
+
 ## カスタムルール
 
 - コミットメッセージは日本語で記述
@@ -573,22 +626,22 @@ AskUserQuestion:
 ### AskUserQuestion の活用
 
 - **Phase 1**: プロジェクト情報（4問）
-- **Phase 2**: 詳細設定（2問 + カスタマイズ時は追加7問）
+- **Phase 2**: 詳細設定（3問 + カスタマイズ時は追加7問 + Hooks 選択導入時は追加3問）
 - **Phase 3**: ペルソナ設定（選択肢により変動）
 
 **合計AskUserQuestion呼び出し回数（例）**:
-- **推奨設定 + ペルソナ無効**: 7回
+- **推奨設定 + Hooks 全導入 + ペルソナ無効**: 8回
   - Phase 1: 4回
-  - Phase 2: 3回（i18n + 監査エージェント + ペルソナ有効化）
+  - Phase 2: 4回（i18n + 監査エージェント + Hooks + ペルソナ有効化）
   - Phase 3: スキップ
-- **カスタマイズ + 共通ペルソナ（自動補完あり）**: 17回
+- **カスタマイズ + Hooks 選択 + 共通ペルソナ（自動補完あり）**: 21回
   - Phase 1: 4回
-  - Phase 2: 3回（i18n + 監査エージェント） + 7回（監査エージェント個別）
+  - Phase 2: 4回（i18n + 監査エージェント + Hooks + ペルソナ有効化） + 7回（監査エージェント個別） + 3回（Hooks 個別）
   - Phase 3: 1回（ペルソナ選択） + 3回（名前・役割・作品） + 1回（自動補完確認） + 1回（確認）
-- **カスタマイズ + エージェント別ペルソナ（手動入力）**: 20回以上
+- **カスタマイズ + Hooks 導入しない + エージェント別ペルソナ（手動入力）**: 20回以上
   - Phase 1: 4回
-  - Phase 2: 3回（i18n + 監査エージェント） + 7回（監査エージェント個別）
-  - Phase 3: 1回（ペルソナ選択） + （6回 × 4エージェント = 24回）
+  - Phase 2: 4回（i18n + 監査エージェント + Hooks + ペルソナ有効化） + 7回（監査エージェント個別）
+  - Phase 3: 1回（ペルソナ選択） + （6回 x 4エージェント = 24回）
 
 ### 備考欄の自動生成
 
