@@ -110,8 +110,8 @@ AskUserQuestion:
 ```yaml
 AskUserQuestion:
   question: |
-    Hooks テンプレートを導入しますか？（Write/Edit後の自動フォーマット、機密情報の書き込み防止、プログレス自動更新）
-    a) すべて導入（auto-format + security-scan + progress）
+    Hooks テンプレートを導入しますか？（Write/Edit後の自動フォーマット、機密情報の書き込み防止）
+    a) すべて導入（auto-format + security-scan）
     b) 選択して導入
     c) 導入しない
   questionType: "freeform"
@@ -119,7 +119,7 @@ AskUserQuestion:
 
 **「b) 選択して導入」を選択した場合**:
 
-各 Hooks テンプレートについて一問一答で質問（計3回の AskUserQuestion 呼び出し）：
+各 Hooks テンプレートについて一問一答で質問（計2回の AskUserQuestion 呼び出し）：
 
 ```yaml
 AskUserQuestion:
@@ -139,15 +139,6 @@ AskUserQuestion:
   questionType: "freeform"
 ```
 
-```yaml
-AskUserQuestion:
-  question: |
-    Stop: update-progress（作業プログレスの自動記録）を導入しますか？
-    a) 導入する
-    b) 導入しない
-  questionType: "freeform"
-```
-
 **Hooks テンプレート導入時の動作**:
 
 1. `.claude/hooks/` ディレクトリを作成: `mkdir -p .claude/hooks`
@@ -158,7 +149,6 @@ AskUserQuestion:
 **生成されるファイル**:
 - `auto-format` 選択時: `.claude/hooks/auto-format.sh`
 - `security-scan` 選択時: `.claude/hooks/security-scan.sh`
-- `update-progress` 選択時: `.claude/hooks/update-progress.sh`
 
 スクリプトの内容は `docs/hooks-guide.md` のテンプレートに準拠する。
 
@@ -569,7 +559,6 @@ AskUserQuestion:
 |------|------|------|
 | auto-format | {true/false} | Write/Edit 後にフォーマッター自動実行 |
 | security-scan | {true/false} | 機密情報の書き込み防止 |
-| update-progress | {true/false} | 作業プログレスの自動記録 |
 
 ## カスタムルール
 

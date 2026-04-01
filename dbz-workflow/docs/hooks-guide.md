@@ -336,77 +336,6 @@ exit 0
 
 ---
 
-### 3. Stop: プログレスファイルの自動更新
-
-Claude の応答完了時に、作業の進捗状況をファイルに記録します。長時間の作業セッションで進捗を追跡するのに役立ちます。
-
-**.claude/settings.json への追加:**
-
-```json
-{
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/update-progress.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-**スクリプト例（.claude/hooks/update-progress.sh）:**
-
-```bash
-#!/bin/bash
-# Stop: プログレスファイルの自動更新
-#
-# Claude の応答完了時に、セッション情報とタイムスタンプをプログレスファイルに記録する。
-# 長時間作業のログや、セッション間での進捗共有に活用できる。
-
-set -euo pipefail
-
-INPUT=$(cat)
-SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // "unknown"')
-
-# プログレスファイルのパス（.claude/ 配下に保存）
-PROGRESS_DIR="${CLAUDE_PROJECT_DIR}/.claude"
-PROGRESS_FILE="${PROGRESS_DIR}/progress.md"
-
-# .claude ディレクトリが存在しない場合は何もしない
-if [[ ! -d "$PROGRESS_DIR" ]]; then
-  exit 0
-fi
-
-TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-
-# プログレスファイルが存在しない場合は新規作成
-if [[ ! -f "$PROGRESS_FILE" ]]; then
-  cat > "$PROGRESS_FILE" <<HEADER
-# 作業プログレス
-
-自動記録された作業セッションのログ。
-
----
-
-HEADER
-fi
-
-# セッション情報を追記
-cat >> "$PROGRESS_FILE" <<ENTRY
-- ${TIMESTAMP} | session: ${SESSION_ID:0:8}
-ENTRY
-
-exit 0
-```
-
----
-
 ## プロジェクトへの導入方法
 
 ### 方法1: .claude/settings.json に直接記述
@@ -439,17 +368,6 @@ exit 0
           }
         ]
       }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/update-progress.sh",
-            "timeout": 10
-          }
-        ]
-      }
     ]
   }
 }
@@ -477,11 +395,6 @@ exit 0
 
 - プロジェクト固有のシークレットパターン（社内APIキーの形式等）を `PATTERNS` に追加する
 - `.env.example` や `*.test.*` ファイルへの書き込みは許可したい場合は、ファイルパスによる除外条件を追加する
-
-### update-progress
-
-- 記録する情報を増やしたい場合は、`transcript_path` から直近の操作を抽出する
-- `.gitignore` に `progress.md` を追加して、Git 管理対象から除外することを推奨する
 
 ---
 
