@@ -124,6 +124,8 @@ gh issue comment <issue_number> --body-file sprint-contract.md
 
 **Phase 0.5 の agentId 管理**: implementer と reviewer それぞれの agentId を `implementer_agent_id_phase05`、`reviewer_agent_id_phase05` として記録する。Phase 1 の implementer は新規起動（Phase 0.5 の agentId は使用しない）。
 
+**最大ループ到達時**: 3回ループしても合意に至らない場合、残存する Critical/Major 指摘をユーザーに報告し、続行/手動修正/中断の選択を求める。
+
 ---
 
 **Phase 1: 実装**
