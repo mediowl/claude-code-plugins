@@ -25,7 +25,8 @@ PRワークフローを簡単に開始・管理するスキル。
 ## Workflow Phases
 
 ```
-Phase 0: ブランチ準備 → Phase 1: 実装 + Code Simplification
+Phase 0: ブランチ準備 → Phase 0.5: スプリント契約（最大3回ループ）
+→ Phase 1: 実装 + Code Simplification
 → Phase 2: 検証 → Phase 3: PR作成
 → Phase 4A: Reviewerレビュー（最大3回ループ）
 → Phase 4B: 監査エージェント（並列/直列フォールバック、最大3回ループ）
@@ -36,7 +37,7 @@ Phase 0: ブランチ準備 → Phase 1: 実装 + Code Simplification
 
 - **設定・Issue取得**: `../../docs/config-loader.md` および `../../docs/issue-context-guide.md` を参照
 - **resume管理**: 前回スキル実行のagentIdは使用しない。`../../docs/agent-resume-guide.md` を参照
-- **ペルソナ**: ペルソナ有効時のみ、サブエージェント呼び出し前に読み込み（`../../docs/config-loader.md` 参照）。Phase 1, 4A, 4B の各エージェント呼び出し前に適用
+- **ペルソナ**: ペルソナ有効時のみ、サブエージェント呼び出し前に読み込み（`../../docs/config-loader.md` 参照）。Phase 0.5, 1, 4A, 4B の各エージェント呼び出し前に適用
 - **サブエージェント出力の表示**: 完了後、出力をそのまま（ペルソナ口調含め）ユーザーに表示すること。無言で次フェーズに進むことは禁止
 - **agentId記録**: 各サブエージェント呼び出し時にagentIdを記録し、修正ループではresumeで再呼び出し
 - **前提条件**: Phase 4A/4B はPRが存在すること
@@ -71,6 +72,61 @@ fi
 `git status` でステージング状況、`gh pr view` でPR状況、各フェーズの完了状況をチェック。
 
 ### 3. 各フェーズの実行
+
+**Phase 0.5: スプリント契約**
+
+Phase 1（実装）開始前に、implementer と reviewer が「スプリント契約」を交渉する。受入基準・テスト条件・レビュー観点を事前合意し、実装のゴールを明確化する。
+
+> **参考**: Anthropic公式ブログ記事 "Harness design for long-running apps" (2026/3/24) の Sprint Contract パターンに基づく。
+
+**契約フロー**:
+1. implementer が契約を提案（`subagent_type: "dbz-workflow:workflow:implementer"` で起動。プロンプトに「Phase 0.5: スプリント契約の提案」であることとIssue情報を含める）
+2. reviewer が契約を評価（`subagent_type: "dbz-workflow:workflow:reviewer"` で起動。プロンプトに「Phase 0.5: スプリント契約の評価」であることと契約内容を含める）
+3. Critical/Major があれば implementer を resume で再呼び出しし修正、再度 reviewer が評価（最大3回ループ）
+4. Minor/Suggestion のみなら契約合意、Phase 1 へ進む
+
+**implementer への指示内容**: 以下の構造化フォーマットで契約を提案すること。
+
+```markdown
+## スプリント契約
+
+### 受入基準
+- [ ] [基準1: 具体的かつ検証可能な条件]
+- [ ] [基準2]
+
+### FAIL 条件（契約違反とみなすケース）
+- [FAIL] [条件1: この状態であれば実装失敗とみなす]
+- [FAIL] [条件2]
+
+### テスト条件
+- [ ] [テスト1: 何をどう検証するか]
+- [ ] [テスト2]
+
+### レビュー観点（reviewer が重点的に確認する項目）
+- [観点1]
+- [観点2]
+```
+
+**reviewer への評価指示（形式的承認防止）**: 契約を評価する際、以下の観点で厳密にチェックすること。形式的な承認（rubber-stamping）は禁止。
+
+- 各 FAIL 条件は**具体的かつ検証可能**か（曖昧な表現がないか）
+- 受入基準に**漏れ**はないか（Issue の要件を網羅しているか）
+- テスト条件は受入基準を**十分にカバー**しているか
+- レビュー観点は実装の**リスク領域**を適切に捉えているか
+
+**契約の永続化**: 合意した契約は以下のコマンドで Issue コメントに投稿する。
+
+```bash
+gh issue comment <issue_number> --body-file sprint-contract.md
+```
+
+契約コメントの見出しは `## スプリント契約 v{version}`（v0 から開始、ループごとに増加）とする。Phase 1 の implementer と Phase 4A の reviewer は、この契約を参照して作業を行う。
+
+**Phase 0.5 の agentId 管理**: implementer と reviewer それぞれの agentId を `implementer_agent_id_phase05`、`reviewer_agent_id_phase05` として記録する。Phase 1 の implementer は新規起動（Phase 0.5 の agentId は使用しない）。
+
+**最大ループ到達時**: 3回ループしても合意に至らない場合、残存する Critical/Major 指摘をユーザーに報告し、続行/手動修正/中断の選択を求める。
+
+---
 
 **Phase 1: 実装**
 
@@ -138,7 +194,7 @@ gh pr create --title "<title>" --body "<body>"
 
 ## TodoList Integration
 
-ワークフロー開始時にTodoWriteツールでPhase 0-5のタスクリストを作成し、各フェーズ完了時にステータスを更新する。
+ワークフロー開始時にTodoWriteツールでPhase 0-0.5-1-2-3-4A-4B-5のタスクリストを作成し、各フェーズ完了時にステータスを更新する。
 
 ## Absolute Rules
 
