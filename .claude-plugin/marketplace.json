@@ -1,0 +1,19 @@
+{
+  "name": "mediowl-plugins",
+  "description": "mediowl 社内共通 Claude Code プラグイン集",
+  "owner": {
+    "name": "mediowl"
+  },
+  "plugins": [
+    {
+      "name": "dbz-workflow",
+      "source": "./dbz-workflow",
+      "description": "実装計画・プルリクエストワークフローツールキット"
+    },
+    {
+      "name": "piwf",
+      "source": "./piwf",
+      "description": "PIWF -- Product Innovation Workflow Framework。プロダクト開発ワークフロー（Phase 0-3 + ゲートレビュー + 振り返り）"
+    }
+  ]
+}
