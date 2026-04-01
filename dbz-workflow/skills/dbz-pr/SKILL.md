@@ -192,7 +192,7 @@ gh pr create --title "<title>" --body "<body>"
 2. Critical/Majorを検出したエージェントのみresumeで再呼び出し
 3. Critical/Major残存ならループ継続、すべてMinor/Suggestion以下ならPhase 5へ
 
-**Phase 5: マージ待ち** -- Phase 4A/4B完了後、マージ待ち状態で停止。完了メッセージにハーネス見直しの案内（`/dbz-retro`）を含める。
+**Phase 5: マージ待ち** -- Phase 4A/4B完了後、マージ待ち状態で停止。
 
 ## Documentation-Only Changes
 
