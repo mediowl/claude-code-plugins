@@ -79,6 +79,12 @@ Phase 1（実装）開始前に、implementer と reviewer が「スプリント
 
 > **参考**: Anthropic公式ブログ記事 "Harness design for long-running apps" (2026/3/24) の Sprint Contract パターンに基づく。
 
+**スキップ条件**: ワークフロー開始時に取得済みの Issue コメントに「スプリント契約」という文字列が含まれている場合（`/dbz-plan` で計画テンプレートに契約が定義済み）、Phase 0.5 をスキップする。
+
+- **検出方法**: Issue コメント本文の部分一致で判定（見出しレベルやバージョン番号に依存しない）。dbz-plan の計画テンプレートでは `###`（テンプレート内の他セクションと統一）、dbz-pr の Phase 0.5 契約では `##`（独立 Issue コメント）を使用するが、部分一致のため見出しレベルの差異は影響しない
+- **スキップ時の動作**: 既存契約の内容をユーザーに表示し、「既存のスプリント契約を検出したため Phase 0.5 をスキップします」と通知して Phase 1 へ進む
+- **非スキップ時**: 従来通り契約交渉を実行（既存動作に変更なし）
+
 **契約フロー**:
 1. implementer が契約を提案（`subagent_type: "dbz-workflow:workflow:implementer"` で起動。プロンプトに「Phase 0.5: スプリント契約の提案」であることとIssue情報を含める）
 2. reviewer が契約を評価（`subagent_type: "dbz-workflow:workflow:reviewer"` で起動。プロンプトに「Phase 0.5: スプリント契約の評価」であることと契約内容を含める）
