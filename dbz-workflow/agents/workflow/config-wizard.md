@@ -110,7 +110,7 @@ AskUserQuestion:
 ```yaml
 AskUserQuestion:
   question: |
-    Hooks テンプレートを導入しますか？（詳細は docs/hooks-guide.md を参照）
+    Hooks テンプレートを導入しますか？（Write/Edit後の自動フォーマット、機密情報の書き込み防止、プログレス自動更新）
     a) すべて導入（auto-format + security-scan + progress）
     b) 選択して導入
     c) 導入しない
