@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$PLUGIN_DIR/../shared/check-update.sh piwf mediowl-plugins mediowl/claude-code-plugins",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
