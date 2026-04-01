@@ -111,11 +111,12 @@ Phase 0 開始時に `git worktree list` を実行し、メインワークツリ
 
 - Implementerで実装を行う（下記の呼び出し例を参照）
 - Implementer完了後、**/dbz-prが`/simplify`スキルを呼び出す**（サブエージェント間呼び出し不可のため）
+- `/simplify`完了後はユーザー入力を待たず、直ちにPhase 2へ進む
 - コード変更がない場合（.mdのみ）は`/simplify`をスキップ
 
 **implementer呼び出し**: `subagent_type: "dbz-workflow:workflow:implementer"` でAgent起動。Issue情報をプロンプトに含め、agentIdを記録。
 
-**`/simplify`**: Implementer完了後にSkillツールで呼び出し。
+**`/simplify`**: Implementer完了後にSkillツールで呼び出し。`/simplify`完了後、ユーザー入力を待たずにPhase 2へ自動的に継続すること。`/simplify`はワークフローの一部であり、独立した対話ではない。
 
 **implementer出力の検証（必須）**: 出力にレビュー・監査系の見出し（「[OK] APPROVED」等）が含まれていたら、セルフレビューの可能性を警告し、Phase 4A/4Bで正規レビューを実施。
 
