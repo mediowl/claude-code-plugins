@@ -22,6 +22,14 @@
 | audit-link | true | ドキュメント内リンク切れ検出に有用 |
 | audit-test | false | テストフレームワークなし |
 
+## モデル設定
+
+| エージェント | モデル |
+|-------------|--------|
+| reviewer | sonnet |
+| audit-doc | sonnet |
+| audit-link | sonnet |
+
 ## カスタムルール
 
 - ユーザーとの対話はすべて日本語で行うこと
