@@ -41,14 +41,14 @@ Phase 5: マージ（人間のみ）
 
 ### 監査エージェント設定
 
-`SKILL.md` の「監査エージェント設定」テーブルを編集して監査を有効/無効化：
+`.claude/dbz-workflow.config.md` の「監査エージェント設定」テーブルを編集して監査を有効/無効化：
 
 ```markdown
 | エージェント | 有効 | 備考 |
 |-------------|------|------|
-| audit-black-hacker | true | 必須 |
-| audit-white-hacker | true | 必須 |
-| audit-doc | true | 必須 |
+| audit-black-hacker | true | |
+| audit-white-hacker | true | |
+| audit-doc | true | 必須（全プロジェクト共通） |
 | audit-i18n | false | 単一言語プロジェクトでは無効化 |
 ```
 
