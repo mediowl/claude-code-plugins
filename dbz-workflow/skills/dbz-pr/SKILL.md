@@ -247,7 +247,7 @@ Critical/Majorがあれば修正ループ（最大3回）:
 
 ## セマンティックバージョニング基準
 
-plugin.json のバージョン管理については [shared-plugin/CLAUDE.md](../../../../CLAUDE.md) を参照してください。
+plugin.json のバージョン管理については [CLAUDE.md](../../../CLAUDE.md) を参照してください。
 
 ---
 

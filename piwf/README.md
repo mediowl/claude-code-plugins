@@ -7,24 +7,23 @@
 ### 1. リポジトリをクローン
 
 ```bash
-git clone https://github.com/mediowl/claude-code-manual.git
-cd claude-code-manual
+git clone https://github.com/mediowl/claude-code-plugins.git ~/.claude/plugin-sources/mediowl-plugins
 ```
 
 ### 2. マーケットプレイスを登録
 
 ```bash
-claude plugin marketplace add ./shared-plugin/plugins
+claude plugin marketplace add ~/.claude/plugin-sources/mediowl-plugins
 ```
 
 ### 3. プラグインをインストール
 
 ```bash
 # プロジェクトスコープ（チーム共有）
-claude plugin install piwf@shared-plugins --scope project
+claude plugin install piwf@mediowl-plugins --scope project
 
 # またはユーザースコープ（個人環境）
-claude plugin install piwf@shared-plugins --scope user
+claude plugin install piwf@mediowl-plugins --scope user
 ```
 
 ### 4. 確認
@@ -38,12 +37,12 @@ claude plugin list
 プラグインのソースコードが更新された場合:
 
 ```bash
-claude plugin update piwf@shared-plugins --scope project
+claude plugin update piwf@mediowl-plugins --scope project
 ```
 
 > **注意**: 更新後は **Claude Code の再起動が必須**です。再起動しないと変更が反映されません。
 
-> **開発者向け**: プラグインのソースを変更した場合、`plugin.json` のバージョン更新が必要です。詳細は [shared-plugin/CLAUDE.md](../../CLAUDE.md#バージョン管理ルール) を参照してください。
+> **開発者向け**: プラグインのソースを変更した場合、`plugin.json` のバージョン更新が必要です。詳細は [CLAUDE.md](../CLAUDE.md#バージョン管理ルール) を参照してください。
 
 ## 提供スキル
 
@@ -182,5 +181,5 @@ piwf/
 ## アンインストール
 
 ```bash
-claude plugin uninstall piwf@shared-plugins
+claude plugin uninstall piwf@mediowl-plugins
 ```
