@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$PLUGIN_DIR/hooks/check-update.sh dbz-workflow mediowl-plugins mediowl/claude-code-plugins",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/check-update.sh dbz-workflow mediowl-plugins mediowl/claude-code-plugins",
             "timeout": 30
           }
         ]
