@@ -126,10 +126,27 @@ EnterWorktree(name: "team-{issue_number}")
 6. reviewer（`subagent_type: "dbz-workflow:workflow:reviewer"`）レビュー（最大3ループ）
 7. 監査エージェント実行（設定に基づき有効なもののみ、最大3ループ）
 
+> **注意**: reviewer / 監査エージェントの実行結果は PR コメントとして残る。コメントが存在しない場合、Lead は完了を承認しない。
+
 #### Step 4: 完了報告
 
-1. TaskUpdate でタスクを完了に更新
-2. SendMessage で Lead に報告（PR URL を含む）
+以下のフォーマットで SendMessage を使い Lead に報告する:
+
+```
+[完了報告]
+Issue: #XXX
+PR: #YYY
+
+## reviewer 結果
+- 指摘件数: Critical X / Major X / Minor X / Suggestion X
+- 修正コミット: {あり/なし}
+
+## 監査結果
+- {監査エージェント名}: Critical X / Major X / Minor X / Suggestion X
+- 修正コミット: {あり/なし}
+```
+
+Lead は報告内容と PR コメントの整合性を検証した上で TaskUpdate で完了にする。
 
 #### Step 5: ワークツリー退出
 
@@ -161,6 +178,9 @@ Lead は以下の責務を担う:
 2. **質問中継**: teammate からの SendMessage を受け取り、AskUserQuestion でユーザーに転送する
 3. **失敗処理**: teammate が失敗した場合、記録して他の teammate は継続する
 4. **定期監視**: `/loop` スキルで teammate の進捗を定期監視する（後述）
+5. **完了検証**: teammate から完了報告を受けた際、以下を確認してから TaskUpdate で完了にする:
+   - `gh pr view <PR番号> --json comments,reviews` でレビュー・監査コメントの存在を確認
+   - コメントが存在しない場合は teammate に差し戻す
 
 #### 定期監視（/loop）
 
