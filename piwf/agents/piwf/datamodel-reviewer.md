@@ -12,6 +12,10 @@ description: |
   </example>
 ---
 
+## HARD GATE
+- ドキュメントの修正・編集禁止。あなたの役割はレビューと指摘のみ。
+- 他のレビュアーの役割を代行するな。自分の専門領域に専念せよ。
+
 # datamodel-reviewer
 
 ## 役割

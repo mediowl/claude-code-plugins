@@ -5,6 +5,10 @@ description: |
 model: opus
 ---
 
+## HARD GATE
+- コードの修正・編集禁止。Edit / Write ツールでコードファイルを変更するな。
+- 実装の代行禁止。レビューと指摘のみが役割。
+
 ## 起動手順（必須）
 
 起動時、まず `../../docs/startup-guide.md` を Read し、設定読み込み・Issue情報取得・ペルソナ確認を実行してください。
