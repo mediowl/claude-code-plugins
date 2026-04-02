@@ -86,7 +86,7 @@ Phase 3完了時に自動生成せよ。
 | 3 | piwf-output/{プロジェクト名}/mock-plan.md | モック計画（UI存在時） |
 | 3 | piwf-output/{プロジェクト名}/library-notes.md | ライブラリ対策 |
 | 3 | piwf-output/{プロジェクト名}/task-breakdown.md | タスク分割表 |
-| - | CLAUDE.md（プロジェクトルート） | 実装時の行動指針 |
+| 3 | piwf-output/{プロジェクト名}/CLAUDE.md | 実装時の行動指針 |
 
 ### デザインシステムのパスについて
 - 既存の `design-system/{プロジェクト名}/MASTER.md`（ui-ux-pro-max 生成）がある場合: そのパスを記載する
