@@ -112,6 +112,15 @@ EnterWorktree(name: "team-{issue_number}")
 
 > **dbz-plan Phase 5 との差分**: dbz-plan ではユーザーに選択肢を提示するが、dbz-team では Minor/Suggestion のみの場合は自動承認する。
 
+#### 報告タイミング（各ステップ完了時に SendMessage で Lead に報告）
+
+1. 計画を Issue に投稿した後
+2. plan-reviewer の結果を Issue に投稿した後
+3. PR を作成した後
+4. reviewer の結果を PR に投稿した後
+5. 各監査の結果を PR に投稿した後
+6. 全作業完了後（構造化フォーマットで最終報告）
+
 #### Step 3: 実装・PR（dbz-pr 相当）
 
 1. ブランチ作成（サブワークツリーのため fetch + checkout）:
@@ -182,6 +191,21 @@ Lead は以下の責務を担う:
    - `gh pr view <PR番号> --json comments,reviews` でレビュー・監査コメントの存在を確認
    - コメントが存在しない場合は teammate に差し戻す
 
+#### 中間チェックポイント（Lead の義務）
+
+teammate からの報告を受けるたびに、該当するチェックを即座に実施する。
+確認できない場合は teammate に差し戻し、確認できるまで次ステップに進ませない。
+
+| タイミング | 確認コマンド | 確認内容 |
+|-----------|------------|---------|
+| 計画投稿後 | `gh issue view <N> --json comments` | 計画コメントの存在 |
+| plan-reviewer 後 | `gh issue view <N> --json comments` | plan-reviewer 結果コメントの存在 |
+| PR 作成後 | `gh pr view <N>` | PR の存在 |
+| reviewer 後 | `gh pr view <N> --json comments` | reviewer 結果コメントの存在 |
+| 各監査後 | `gh pr view <N> --json comments` | 監査結果コメントの存在 |
+
+**原則: teammate の報告を鵜呑みにせず、必ずコマンドで事実確認する。**
+
 #### 定期監視（/loop）
 
 Phase 1 の並列実行開始後、Lead は `/loop` スキルを使って teammate の処理状況を定期的に監視する。
@@ -249,6 +273,7 @@ Phase 1 の並列実行開始後、Lead は `/loop` スキルを使って teamma
 6. **内部タスク番号に `#` 使用禁止** — GitHub誤リンク防止
 7. **同時実行数超過でスポーンしない** — Phase 0 で算出した max_concurrent を超える teammate を同時にスポーンしない
 8. **失敗 teammate を無限リトライしない** — 失敗した teammate は記録し、同一Issueの再試行は行わない
+9. **Lead はエビデンス未確認で TaskUpdate しない** — teammate の報告だけで完了扱いにせず、Issue/PR コメントの存在をコマンドで確認すること
 
 ---
 
