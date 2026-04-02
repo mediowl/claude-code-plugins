@@ -65,7 +65,7 @@ if echo "$COMMAND" | grep -qE 'git\s+merge\b|gh\s+pr\s+merge\b'; then
   exit 2
 fi
 
-if echo "$COMMAND" | grep -qE 'git\s+add\s+(-A\b|--all\b|\.\s*$)'; then
+if echo "$COMMAND" | grep -qE 'git\s+add\s+(-A\b|--all\b|\.(\s|$|;|&|\|))'; then
   echo "BLOCKED: git add -A / git add --all / git add . は禁止されています。変更ファイルを明示的に指定してください。" >&2
   exit 2
 fi

@@ -59,5 +59,11 @@ if echo "$COMMAND" | grep -qE 'git\s+push\s+--force(\s|$)|git\s+push\s+-f\b'; th
   exit 2
 fi
 
+# --- CLAUDE.md 共通ルール ---
+if echo "$COMMAND" | grep -qE 'git\s+add\s+(-A\b|--all\b|\.(\s|$|;|&|\|))'; then
+  echo "BLOCKED: git add -A / git add --all / git add . は禁止されています。変更ファイルを明示的に指定してください。" >&2
+  exit 2
+fi
+
 # 正常コマンド: 通過
 exit 0
