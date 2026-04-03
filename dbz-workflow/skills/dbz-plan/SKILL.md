@@ -58,12 +58,12 @@ Phase 5: 計画承認 → workflow-pr連携確認
 
 ---
 
-### サブエージェントのresume管理
+### サブエージェントの再開管理
 
 > **agentId汚染防止**: 前回のスキル実行で取得したagentIdは使用しない。すべてのagentIdはこのスキル実行内で新規取得すること。異なるスキル実行間でagentIdを引き継ぐと、意図しないコンテキスト混入やコンテキストリミット到達の原因となる。
 
 1. 1回目: 新規起動、agentIdを記録
-2. 2回目以降: `resume` パラメータに agentId を指定
+2. 2回目以降: `SendMessage({to: agentId})` で再開
 
 **詳細仕様**: `../../docs/agent-resume-guide.md` を参照
 

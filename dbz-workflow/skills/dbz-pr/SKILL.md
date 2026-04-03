@@ -36,10 +36,10 @@ Phase 0: ブランチ準備 → Phase 0.5: スプリント契約（最大3回ル
 ## 共通仕様
 
 - **設定・Issue取得**: `../../docs/config-loader.md` および `../../docs/issue-context-guide.md` を参照
-- **resume管理**: 前回スキル実行のagentIdは使用しない。`../../docs/agent-resume-guide.md` を参照
+- **再開管理**: 前回スキル実行のagentIdは使用しない。`../../docs/agent-resume-guide.md` を参照
 - **ペルソナ**: ペルソナ有効時のみ、サブエージェント呼び出し前に読み込み（`../../docs/config-loader.md` 参照）。Phase 0.5, 1, 4A, 4B の各エージェント呼び出し前に適用
 - **サブエージェント出力の表示**: 完了後、出力をそのまま（ペルソナ口調含め）ユーザーに表示すること。無言で次フェーズに進むことは禁止
-- **agentId記録**: 各サブエージェント呼び出し時にagentIdを記録し、修正ループではresumeで再呼び出し
+- **agentId記録**: 各サブエージェント呼び出し時にagentIdを記録し、修正ループではSendMessage({to: agentId})で再呼び出し
 - **前提条件**: Phase 4A/4B はPRが存在すること
 
 ## Execution Flow
@@ -88,7 +88,7 @@ Phase 1（実装）開始前に、implementer と reviewer が「スプリント
 **契約フロー**:
 1. implementer が契約を提案（`subagent_type: "dbz-workflow:workflow:implementer"` で起動。プロンプトに「Phase 0.5: スプリント契約の提案」であることとIssue情報を含める）
 2. reviewer が契約を評価（`subagent_type: "dbz-workflow:workflow:reviewer"` で起動。プロンプトに「Phase 0.5: スプリント契約の評価」であることと契約内容を含める）
-3. Critical/Major があれば implementer を resume で再呼び出しし修正、再度 reviewer が評価（最大3回ループ）
+3. Critical/Major があれば implementer を SendMessage で再呼び出しし修正、再度 reviewer が評価（最大3回ループ）
 4. Minor/Suggestion のみなら契約合意、Phase 1 へ進む
 
 **implementer への指示内容**: 以下の構造化フォーマットで契約を提案すること。
@@ -169,11 +169,11 @@ gh pr create --title "<title>" --body "<body>"
 
 **Phase 4A 修正ループ**（Critical/Majorがあれば最大3回）:
 
-> **implementerのresume上限**: Phase 1の初回呼び出しからPhase 4A終了までの合計resume回数は最大3回。コンテキストリミット到達防止のための制限。
+> **implementerの再開上限**: Phase 1の初回呼び出しからPhase 4A終了までの合計SendMessage再開回数は最大3回。コンテキストリミット到達防止のための制限。
 
-1. implementerを`resume`で再呼び出し（Phase 1のagentIdを使用）し、Critical/Major指摘を修正
+1. implementerを`SendMessage({to: agentId})`で再呼び出し（Phase 1のagentIdを使用）し、Critical/Major指摘を修正
 2. 修正内容をコミット・プッシュ
-3. reviewerを`resume`で再呼び出しし再レビュー
+3. reviewerを`SendMessage({to: agentId})`で再呼び出しし再レビュー
 4. Critical/Major残存ならループ継続、Minor/SuggestionのみならPhase 4Bへ
 
 **Phase 4B: 監査エージェント**
@@ -187,9 +187,9 @@ gh pr create --title "<title>" --body "<body>"
 
 **Phase 4B 修正ループ**（Critical/Majorがあれば最大3回）:
 
-1. implementerを **fresh start + コンテキストサマリー** で呼び出し（Phase境界リセット: Phase 1のagentIdは使用しない）。`implementer_agent_id_phase4b` を記録し、2回目以降はresumeで再呼び出し
+1. implementerを **fresh start + コンテキストサマリー** で呼び出し（Phase境界リセット: Phase 1のagentIdは使用しない）。`implementer_agent_id_phase4b` を記録し、2回目以降はSendMessageで再呼び出し
    - **コンテキストサマリー**（workflow-prが生成）: 変更ファイル一覧、実装方針、Phase 4Aでの修正内容
-2. Critical/Majorを検出したエージェントのみresumeで再呼び出し
+2. Critical/Majorを検出したエージェントのみSendMessageで再呼び出し
 3. Critical/Major残存ならループ継続、すべてMinor/Suggestion以下ならPhase 5へ
 
 **Phase 5: マージ待ち** -- Phase 4A/4B完了後、マージ待ち状態で停止。
