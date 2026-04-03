@@ -37,8 +37,8 @@ max_concurrent = min(5, floor(cores / 2), floor(mem_gb / 4))
 
 ## 承認フロー
 
-- **計画レビュー**: plan-reviewer が自動レビュー。Minor/Suggestion のみなら自動承認、Critical は Lead 経由でユーザー確認
-- **コードレビュー**: reviewer + 監査エージェントが自動レビュー（最大3ループ）
+- **計画レビュー**: Lead が plan-reviewer teammate をスポーンし自動レビュー（最大3ループ）。Minor/Suggestion のみなら自動承認、Critical/Major は修正ループ
+- **コードレビュー**: Lead が reviewer teammate + 監査 teammate をスポーンし自動レビュー（各最大3ループ）
 - **マージ**: 人間のみ（teammate は絶対にマージしない）
 
 ---
