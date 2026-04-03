@@ -142,12 +142,14 @@ EnterWorktree(name: "team-{issue_number}")
 9. reviewer teammate からレビュー結果を **SendMessage で直接受信**する
 10. **reviewer 修正ループ**（最大3回）:
     - Critical/Major があれば修正し、コミット・プッシュ → Lead に「reviewer修正完了」を報告 → Lead が reviewer を再スポーン
+    - Critical/Major が残存し、かつ最大ループ到達 → Lead に報告し、Lead 経由でユーザーに続行/手動修正/中断の選択を求める
     - Minor/Suggestion のみ → 監査フェーズへ
 11. **SendMessage で Lead に「reviewer完了」を報告**する
 12. Lead が `audit-{type}-{issue}` teammate をスポーンする（後述 Phase 2 参照）
 13. 監査 teammate からの結果を **SendMessage で直接受信**する
 14. **監査修正ループ**（最大3回）:
     - Critical/Major があれば修正し、コミット・プッシュ → Lead に「監査修正完了」を報告 → Lead が監査を再スポーン
+    - Critical/Major が残存し、かつ最大ループ到達 → Lead に報告し、Lead 経由でユーザーに続行/手動修正/中断の選択を求める
     - Minor/Suggestion のみ → Step 4 へ
 
 > **注意**: reviewer / 監査 teammate の実行結果は PR コメントとして残る。コメントが存在しない場合、Lead は完了を承認しない。
@@ -326,7 +328,7 @@ Phase 1 の並列実行開始後、Lead は `/loop` スキルを使って teamma
 4. **AskUserQuestion は Lead のみ使用** — teammate は SendMessage で Lead に質問する
 5. **ワークツリー分離厳守** — 各 teammate は EnterWorktree で分離されたワークツリーで作業する
 6. **内部タスク番号に `#` 使用禁止** — GitHub誤リンク防止
-7. **同時実行数超過でスポーンしない** — Phase 0 で算出した max_concurrent を超える teammate を同時にスポーンしない
+7. **同時実行数超過でスポーンしない** — Phase 0 で算出した max_concurrent を超える実装 teammate（`worker-{issue}`）を同時にスポーンしない。遅延スポーンの役割別 teammate（plan-reviewer / reviewer / 監査）はカウント対象外（詳細は Phase 2 遅延スポーン仕様を参照）
 8. **失敗 teammate を無限リトライしない** — 失敗した teammate は記録し、同一Issueの再試行は行わない
 9. **Lead はエビデンス未確認で TaskUpdate しない** — teammate の報告だけで完了扱いにせず、Issue/PR コメントの存在をコマンドで確認すること
 
