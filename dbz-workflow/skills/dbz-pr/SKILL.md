@@ -153,10 +153,10 @@ npm test
 
 **Phase 3: PR作成**
 
+**git 操作のアトミック実行（必須）**: ワークツリー環境での競合防止のため、git add/commit/push は `&&` で連結した単一コマンドチェーンで実行する。
+
 ```bash
-git add <files>
-git commit -m "<message>"
-git push -u origin <branch>
+git add <files> && git commit -m "<message>" && git push -u origin <branch>
 gh pr create --title "<title>" --body "<body>"
 ```
 
@@ -221,6 +221,7 @@ gh pr create --title "<title>" --body "<body>"
 12. **サブエージェントのPRコメント投稿を代行禁止** -- サブエージェントは自身でPRコメントを投稿する責務を持つ。親エージェント（workflow-pr）は投稿を代行しない
 13. **サブエージェントの結果を改変禁止** -- 例: reviewerが「Minor 3件」と判定した場合、親エージェントが「Major 1件」に変更することは禁止。問題があればユーザーに判断を委ねる
 14. **implementer のセルフレビュー禁止** -- implementer が reviewer/audit-* の役割を兼ねることを禁止。セルフレビュー結果が含まれていた場合は無視し、正規フェーズで再実行すること
+15. **git 操作はアトミック実行** -- git add/commit/push は `&&` で連結した単一コマンドチェーンで実行すること。ワークツリー環境での競合防止のため、コマンドを分割して個別実行することは禁止
 
 ## セマンティックバージョニング基準
 

@@ -100,6 +100,28 @@ TeamCreate(team_name: "dbz-team-{timestamp}")
 EnterWorktree(name: "team-{issue_number}")
 ```
 
+**ワークツリー分離検証（必須）**: EnterWorktree 直後に以下を実行し、ワークツリーが正しく分離されていることを確認する。
+
+```bash
+pwd && git worktree list
+```
+
+**検証基準**:
+- `pwd` の出力が `.claude/worktrees/team-{issue_number}` を含むこと
+- `git worktree list` でメインワークツリーと別のパスが表示されること
+
+**検証失敗時**: メインワークツリーのまま（パスに `.claude/worktrees/` を含まない）の場合、**作業を即座に中断**し、以下のフォーマットで Lead に報告する:
+
+```
+[失敗報告]
+Issue: #XXX
+Phase: Step 1（ワークツリー進入）
+エラー内容: EnterWorktree 後のワークツリー分離検証に失敗。pwd = {実際のパス}
+試行回数: 1
+```
+
+> **背景**: EnterWorktree の Claude Code 側既知バグ（CWD ズレによるネスト: anthropics/claude-code#27881, #27974, #27134）により、ワークツリーが正しく分離されず、複数 teammate が同じワークツリーを共有してしまう問題が報告されている。
+
 #### Step 2: 計画（dbz-plan 相当）
 
 1. `gh issue view <issue_number> --json title,body,comments` でIssue情報を取得
@@ -133,6 +155,28 @@ EnterWorktree(name: "team-{issue_number}")
    git checkout -b <type>/<issue>-<description> origin/main
    ```
 2. **teammate 自身が直接実装する**（計画に基づいてコードを実装。implementer エージェントの別途スポーンは不要）
+
+**git 操作のアトミック実行（必須）**: ワークツリー環境では、git 操作（add, commit, push）を単一コマンドチェーン（`&&` 連結）で実行し、プロセス間介入による競合を防ぐ。
+
+```bash
+# [OK] アトミック実行（推奨）
+git add <files> && git commit -m "<message>" && git push -u origin <branch>
+
+# [NG] コマンドを分割して実行（禁止）
+git add <files>
+git commit -m "<message>"
+git push -u origin <branch>
+```
+
+**競合検出時の対応**: git 操作中にエラー（例: `fatal: cannot lock ref`, `error: failed to push`）が発生した場合、**作業を即座に中断**し、以下のフォーマットで Lead に報告する:
+
+```
+[失敗報告]
+Issue: #XXX
+Phase: Step 3（git 操作競合）
+エラー内容: {エラーメッセージ全文}
+試行回数: 1
+```
 3. Phase 0.5（スプリント契約交渉）: 計画にスプリント契約が含まれている場合はスキップ（dbz-pr と同じ仕様）
 4. `/simplify` スキル実行（コード変更がある場合）
 5. 検証（テストコマンド実行）
@@ -326,11 +370,12 @@ Phase 1 の並列実行開始後、Lead は `/loop` スキルを使って teamma
 2. **teammate 間で同一Issue処理禁止** — 1つのIssueは1つの teammate のみが担当する
 3. **Lead は teammate の結果を改変しない** — レビュー結果やPR内容を Lead が書き換えることは禁止
 4. **AskUserQuestion は Lead のみ使用** — teammate は SendMessage で Lead に質問する
-5. **ワークツリー分離厳守** — 各 teammate は EnterWorktree で分離されたワークツリーで作業する
+5. **ワークツリー分離厳守** — 各 teammate は EnterWorktree で分離されたワークツリーで作業する。EnterWorktree 直後に `pwd` と `git worktree list` で分離を検証し、検証失敗時は即座に中断すること（Step 1 参照）
 6. **内部タスク番号に `#` 使用禁止** — GitHub誤リンク防止
 7. **同時実行数超過でスポーンしない** — Phase 0 で算出した max_concurrent を超える実装 teammate（`worker-{issue}`）を同時にスポーンしない。遅延スポーンの役割別 teammate（plan-reviewer / reviewer / 監査）はカウント対象外（詳細は Phase 2 遅延スポーン仕様を参照）
 8. **失敗 teammate を無限リトライしない** — 失敗した teammate は記録し、同一Issueの再試行は行わない
 9. **Lead はエビデンス未確認で TaskUpdate しない** — teammate の報告だけで完了扱いにせず、Issue/PR コメントの存在をコマンドで確認すること
+10. **git 操作はアトミック実行** — git add/commit/push は `&&` で連結した単一コマンドチェーンで実行すること。コマンドを分割して個別実行することは禁止（Step 3 参照）
 
 ---
 
@@ -340,6 +385,8 @@ Phase 1 の並列実行開始後、Lead は `/loop` スキルを使って teamma
 |---------|------|
 | OS スペック算出失敗 | デフォルト 2 にフォールバック |
 | TeamCreate / EnterWorktree 失敗 | 中断し、個別に `/dbz-plan` + `/dbz-pr` の実行を案内 |
+| ワークツリー分離検証失敗 | teammate は即座に中断し Lead に報告。Lead は EnterWorktree の再試行を指示するか、個別に `/dbz-plan` + `/dbz-pr` の実行を案内 |
+| git 操作中の競合検出 | teammate は即座に中断し Lead に報告。Lead は状態を確認し、再試行または手動対応を判断 |
 | teammate エラー停止 | Lead に報告し、他の teammate は継続 |
 | 全 teammate 失敗 | エラーサマリーを報告 |
 | Issue 未存在 | ユーザーにスキップまたは中断の選択肢を提示 |
