@@ -204,6 +204,10 @@ piwf/
 ├── .claude/
 │   └── settings.json
 ├── README.md
+├── hooks/
+│   ├── hooks.json
+│   ├── check-update.sh
+│   └── guard-dangerous-commands.sh
 ├── skills/
 │   ├── piwf/
 │   │   └── SKILL.md
