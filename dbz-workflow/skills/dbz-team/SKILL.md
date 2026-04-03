@@ -105,9 +105,12 @@ EnterWorktree(name: "team-{issue_number}")
 1. `gh issue view <issue_number> --json title,body,comments` でIssue情報を取得
 2. 関連コードの調査（Grep, Glob, Read）
 3. 不明点がある場合は **SendMessage で Lead に質問**する（AskUserQuestion は禁止）
-4. 計画を作成し、Issueコメントに投稿する
-5. plan-reviewer エージェント（`subagent_type: "dbz-workflow:workflow:plan-reviewer"`）でレビュー（最大3ループ）
-6. **自動承認判定**:
+4. 計画（スプリント契約含む）を作成し、Issueコメントに投稿する
+5. **SendMessage で Lead に「計画投稿完了」を報告**する
+6. Lead が `plan-reviewer-{issue}` teammate をスポーンする（後述 Phase 2 参照）
+7. plan-reviewer teammate からレビュー結果を **SendMessage で直接受信**する
+8. **修正ループ**（最大3回）:
+   - Critical/Major があれば計画を修正し、再投稿 → Lead に「修正完了」を報告 → Lead が plan-reviewer を再スポーン
    - Minor/Suggestion のみ → 自動で Step 3 へ進む
    - Critical が含まれる → SendMessage で Lead に報告し、Lead 経由でユーザー確認
 
@@ -129,14 +132,26 @@ EnterWorktree(name: "team-{issue_number}")
    git fetch origin main
    git checkout -b <type>/<issue>-<description> origin/main
    ```
-2. implementer（`subagent_type: "dbz-workflow:workflow:implementer"`）で実装
-3. `/simplify` スキル実行（コード変更がある場合）
-4. 検証（テストコマンド実行）
-5. PR 作成
-6. reviewer（`subagent_type: "dbz-workflow:workflow:reviewer"`）レビュー（最大3ループ）
-7. 監査エージェント実行（設定に基づき有効なもののみ、最大3ループ）
+2. **teammate 自身が直接実装する**（計画に基づいてコードを実装。implementer エージェントの別途スポーンは不要）
+3. Phase 0.5（スプリント契約交渉）: 計画にスプリント契約が含まれている場合はスキップ（dbz-pr と同じ仕様）
+4. `/simplify` スキル実行（コード変更がある場合）
+5. 検証（テストコマンド実行）
+6. PR 作成
+7. **SendMessage で Lead に「PR作成完了」を報告**する
+8. Lead が `reviewer-{issue}` teammate をスポーンする（後述 Phase 2 参照）
+9. reviewer teammate からレビュー結果を **SendMessage で直接受信**する
+10. **reviewer 修正ループ**（最大3回）:
+    - Critical/Major があれば修正し、コミット・プッシュ → Lead に「修正完了」を報告 → Lead が reviewer を再スポーン
+    - Minor/Suggestion のみ → 監査フェーズへ
+11. **SendMessage で Lead に「reviewer完了」を報告**する
+12. Lead が `audit-{type}-{issue}` teammate をスポーンする（後述 Phase 2 参照）
+13. 監査 teammate からの結果を **SendMessage で直接受信**する
+14. **監査修正ループ**（最大3回）:
+    - Critical/Major があれば修正し、コミット・プッシュ → Lead に「修正完了」を報告 → Lead が監査を再スポーン
+    - Minor/Suggestion のみ → Step 4 へ
 
-> **注意**: reviewer / 監査エージェントの実行結果は PR コメントとして残る。コメントが存在しない場合、Lead は完了を承認しない。
+> **注意**: reviewer / 監査 teammate の実行結果は PR コメントとして残る。コメントが存在しない場合、Lead は完了を承認しない。
+> **teammate からの Agent ツール呼び出し不可**: Claude Code v2.1.70 以降、teammate は Agent ツール（subagent_type 指定）を直接呼び出せない。そのため reviewer / 監査は Lead が別 teammate としてスポーンし、teammate 間で SendMessage 連携する設計としている。
 
 #### Step 4: 完了報告
 
@@ -191,19 +206,50 @@ Lead は以下の責務を担う:
 5. **完了検証**: teammate から完了報告を受けた際、以下を確認してから TaskUpdate で完了にする:
    - `gh pr view <PR番号> --json comments,reviews` でレビュー・監査コメントの存在を確認
    - コメントが存在しない場合は teammate に差し戻す
+6. **遅延スポーン（役割別 teammate）**: teammate からの報告を受けたら、次の役割 teammate をスポーンする（詳細は後述）
+
+#### 遅延スポーン仕様
+
+teammate は Agent ツール（subagent_type 指定）を直接呼び出せない（Claude Code v2.1.70 制約）。そのため Lead が以下のタイミングで役割別 teammate をスポーンする。
+
+**スポーントリガーと対象**:
+
+| トリガー（teammate からの報告） | スポーン対象 | teammate 名 |
+|-------------------------------|------------|-------------|
+| 「計画投稿完了」 | plan-reviewer | `plan-reviewer-{issue}` |
+| 「計画修正完了」（ループ時） | plan-reviewer | `plan-reviewer-{issue}` （再スポーン） |
+| 「PR作成完了」 | reviewer | `reviewer-{issue}` |
+| 「reviewer修正完了」（ループ時） | reviewer | `reviewer-{issue}` （再スポーン） |
+| 「reviewer完了」 | 監査エージェント | `audit-{type}-{issue}` |
+| 「監査修正完了」（ループ時） | 監査エージェント | `audit-{type}-{issue}` （再スポーン） |
+
+**スポーン指示テンプレート**:
+
+各 teammate には以下の最低限の情報を含むプロンプトを渡す:
+
+- **plan-reviewer**: Issue番号、計画が投稿されたIssueコメントURL、レビュー結果のIssueコメント投稿先、レビュー完了後に `worker-{issue}` teammate へ SendMessage で結果を通知する指示
+- **reviewer**: Issue番号、PR番号、スプリント契約の内容、レビュー結果のPRコメント投稿先、レビュー完了後に `worker-{issue}` teammate へ SendMessage で結果を通知する指示
+- **監査（audit-*）**: Issue番号、PR番号、監査結果のPRコメント投稿先、監査完了後に `worker-{issue}` teammate へ SendMessage で結果を通知する指示
+
+**同時存在 teammate 数の目安**:
+
+遅延スポーンにより、同時に存在する teammate 数は以下の範囲に収まる:
+- 最小: Issue 数（実装 teammate のみ）
+- 最大: Issue 数 x 2（実装 teammate + reviewer/監査 teammate が同時に1つずつ存在するケース）
+- plan-reviewer / reviewer / 監査は順次実行のため、同一 Issue で複数の役割 teammate が同時存在することはない
 
 #### 中間チェックポイント（Lead の義務）
 
 teammate からの報告を受けるたびに、該当するチェックを即座に実施する。
 確認できない場合は teammate に差し戻し、確認できるまで次ステップに進ませない。
 
-| タイミング | 確認コマンド | 確認内容 |
-|-----------|------------|---------|
-| 計画投稿後 | `gh issue view <N> --json comments` | 計画コメントの存在 |
-| plan-reviewer 後 | `gh issue view <N> --json comments` | plan-reviewer 結果コメントの存在 |
-| PR 作成後 | `gh pr view <N>` | PR の存在 |
-| reviewer 後 | `gh pr view <N> --json comments` | reviewer 結果コメントの存在 |
-| 各監査後 | `gh pr view <N> --json comments` | 監査結果コメントの存在 |
+| タイミング | 確認コマンド | 確認内容 | 次のアクション |
+|-----------|------------|---------|-------------|
+| 計画投稿後 | `gh issue view <N> --json comments` | 計画コメントの存在 | plan-reviewer teammate をスポーン |
+| plan-reviewer 後 | `gh issue view <N> --json comments` | plan-reviewer 結果コメントの存在 | Critical/Major あれば teammate に差し戻し |
+| PR 作成後 | `gh pr view <N>` | PR の存在 | reviewer teammate をスポーン |
+| reviewer 後 | `gh pr view <N> --json comments` | reviewer 結果コメントの存在 | Critical/Major あれば teammate に差し戻し、なければ監査 teammate をスポーン |
+| 各監査後 | `gh pr view <N> --json comments` | 監査結果コメントの存在 | Critical/Major あれば teammate に差し戻し |
 
 **原則: teammate の報告を鵜呑みにせず、必ずコマンドで事実確認する。**
 
