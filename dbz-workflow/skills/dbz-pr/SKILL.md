@@ -41,6 +41,7 @@ Phase 0: ブランチ準備 → Phase 0.5: スプリント契約（最大3回ル
 - **サブエージェント出力の表示**: 完了後、出力をそのまま（ペルソナ口調含め）ユーザーに表示すること。無言で次フェーズに進むことは禁止
 - **agentId記録**: 各サブエージェント呼び出し時にagentIdを記録し、修正ループではSendMessage({to: agentId})で再呼び出し
 - **前提条件**: Phase 4A/4B はPRが存在すること
+- **hooks 登録チェック**: ワークフロー開始時に `bash "${CLAUDE_PLUGIN_ROOT}/hooks/check-hooks-registration.sh"` を実行し、出力があればユーザーに表示する（スキルの実行はブロックしない）
 
 ## Execution Flow
 
