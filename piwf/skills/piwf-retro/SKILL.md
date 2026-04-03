@@ -34,7 +34,7 @@ description: PIWFプロジェクトの振り返り（ゲート検出問題・定
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "",
+        "matcher": "startup",
         "hooks": [
           {
             "type": "command",

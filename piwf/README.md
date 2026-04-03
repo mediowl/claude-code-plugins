@@ -49,7 +49,7 @@ piwf プラグインは以下の hooks を提供していますが、Claude Code
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "",
+        "matcher": "startup",
         "hooks": [
           {
             "type": "command",
