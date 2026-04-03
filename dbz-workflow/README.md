@@ -50,7 +50,7 @@ Claude Code 内で `/hooks` を実行し、対話式で Hooks を追加してく
 - イベント: `SessionStart`
 - matcher: `startup`
 - type: `command`
-- command: `"$CLAUDE_PLUGIN_ROOT"/hooks/check-update.sh dbz-workflow mediowl-plugins mediowl/claude-code-plugins`
+- command: `${CLAUDE_PLUGIN_ROOT}/hooks/check-update.sh dbz-workflow mediowl-plugins mediowl/claude-code-plugins`
 - timeout: `30`
 
 **PreToolUse に追加する内容:**
@@ -58,7 +58,7 @@ Claude Code 内で `/hooks` を実行し、対話式で Hooks を追加してく
 - イベント: `PreToolUse`
 - matcher: `Bash`
 - type: `command`
-- command: `"$CLAUDE_PLUGIN_ROOT"/hooks/guard-dangerous-commands.sh`
+- command: `${CLAUDE_PLUGIN_ROOT}/hooks/guard-dangerous-commands.sh`
 - timeout: `10`
 
 #### 方法2: settings.json を直接編集
@@ -74,7 +74,7 @@ Claude Code 内で `/hooks` を実行し、対話式で Hooks を追加してく
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PLUGIN_ROOT\"/hooks/check-update.sh dbz-workflow mediowl-plugins mediowl/claude-code-plugins",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/check-update.sh dbz-workflow mediowl-plugins mediowl/claude-code-plugins",
             "timeout": 30
           }
         ]
@@ -86,7 +86,7 @@ Claude Code 内で `/hooks` を実行し、対話式で Hooks を追加してく
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PLUGIN_ROOT\"/hooks/guard-dangerous-commands.sh",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-dangerous-commands.sh",
             "timeout": 10
           }
         ]

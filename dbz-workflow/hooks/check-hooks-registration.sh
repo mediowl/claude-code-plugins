@@ -73,7 +73,7 @@ echo "hooks を有効にするには、settings.json に以下を追加してく
 echo "手順: Claude Code で \`/hooks\` を実行するか、settings.json を直接編集してください。"
 echo ""
 echo "詳細は README のセットアップ手順を参照:"
-echo "  https://github.com/mediowl/claude-code-plugins/tree/main/dbz-workflow#セットアップ"
+echo "  https://github.com/mediowl/claude-code-plugins/tree/main/dbz-workflow#5-hooks-のセットアップ"
 echo ""
 
 exit 0
