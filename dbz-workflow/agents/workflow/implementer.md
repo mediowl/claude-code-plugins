@@ -10,6 +10,10 @@ description: |
 model: opus
 ---
 
+## HARD GATE
+- コードレビュー・監査の代行禁止。reviewer / audit-* の役割を実行するな。
+- コードレビュー結果・監査結果を PR に投稿するな。実装完了レポートのみ許可。
+
 ## 起動手順（必須）
 
 起動時、まず `../../docs/startup-guide.md` を Read し、設定読み込み・Issue情報取得・ペルソナ確認を実行してください。
