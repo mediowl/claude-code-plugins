@@ -39,7 +39,7 @@ dbz-workflow には以下の Hooks が含まれていますが、プラグイン
 | Hook | イベント | 機能 |
 |------|---------|------|
 | `check-update.sh` | SessionStart | セッション開始時にプラグインの新バージョンを検出し自動更新 |
-| `guard-dangerous-commands.sh` | PreToolUse | `rm -rf`, `git reset --hard`, `git merge` 等の危険コマンドをブロック |
+| `guard-dangerous-commands.sh` | PreToolUse | `rm -rf`, `DROP TABLE`, `git add -A` 等の危険コマンドをブロック |
 
 #### 方法1: `/hooks` コマンドで設定（推奨）
 
