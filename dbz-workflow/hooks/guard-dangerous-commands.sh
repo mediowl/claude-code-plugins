@@ -28,21 +28,6 @@ if echo "$COMMAND" | grep -qE 'rm\s+-[a-zA-Z]*[fF]'; then
   exit 2
 fi
 
-if echo "$COMMAND" | grep -qE 'git\s+reset\s+--hard'; then
-  echo "BLOCKED: git reset --hard は破壊的コマンドのため禁止されています。" >&2
-  exit 2
-fi
-
-if echo "$COMMAND" | grep -qE 'git\s+checkout\s+--\s+\.(\s|$|;|&|\|)'; then
-  echo "BLOCKED: git checkout -- . は破壊的コマンドのため禁止されています。" >&2
-  exit 2
-fi
-
-if echo "$COMMAND" | grep -qE 'git\s+restore\s+\.(\s|$|;|&|\|)'; then
-  echo "BLOCKED: git restore . は破壊的コマンドのため禁止されています。" >&2
-  exit 2
-fi
-
 if echo "$COMMAND" | grep -qiE 'DROP\s+TABLE'; then
   echo "BLOCKED: DROP TABLE は破壊的コマンドのため禁止されています。" >&2
   exit 2
@@ -53,18 +38,7 @@ if echo "$COMMAND" | grep -qiE 'DROP\s+DATABASE'; then
   exit 2
 fi
 
-# --- プロセス違反 ---
-if echo "$COMMAND" | grep -qE 'git\s+push\s+--force(\s|$)|git\s+push\s+-f\b'; then
-  echo "BLOCKED: git push --force / git push -f はプロセス違反のため禁止されています。" >&2
-  exit 2
-fi
-
 # --- dbz-workflow 固有ルール ---
-if echo "$COMMAND" | grep -qE 'git\s+merge\b|gh\s+pr\s+merge\b'; then
-  echo "BLOCKED: git merge / gh pr merge はエージェントに許可されていません。マージは人間のみが実行できます。" >&2
-  exit 2
-fi
-
 if echo "$COMMAND" | grep -qE 'git\s+add\s+(-A\b|--all\b|\.(\s|$|;|&|\|))'; then
   echo "BLOCKED: git add -A / git add --all / git add . は禁止されています。変更ファイルを明示的に指定してください。" >&2
   exit 2

@@ -366,7 +366,7 @@ Phase 1 の並列実行開始後、Lead は `/loop` スキルを使って teamma
 
 ## Absolute Rules
 
-1. **マージは人間のみ** — teammate は `git merge` / `gh pr merge` を絶対に実行しない
+1. **PR 本流マージは人間のみ** — teammate は PR を main/develop 等の本流ブランチへマージ（`gh pr merge` または対応する `git merge`）してはならない。PR 本流マージの最終承認は人間の責務。ローカル作業ブランチへの `git merge`（作業ブランチに main を取り込む等）や `git merge-base` 等の読み取り系コマンドは許容する
 2. **teammate 間で同一Issue処理禁止** — 1つのIssueは1つの teammate のみが担当する
 3. **Lead は teammate の結果を改変しない** — レビュー結果やPR内容を Lead が書き換えることは禁止
 4. **AskUserQuestion は Lead のみ使用** — teammate は SendMessage で Lead に質問する

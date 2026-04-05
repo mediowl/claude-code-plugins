@@ -206,9 +206,10 @@ gh pr create --title "<title>" --body "<body>"
 ## Absolute Rules
 
 1. **PR作成前に監査エージェントを実行しない**
-2. **[Critical] マージは人間のみ（最重要）** -- Claude Code は `git merge` / `gh pr merge` を **絶対に実行しない**
+2. **[Critical] PR 本流マージは人間のみ（最重要）** -- Claude Code は PR を main/develop 等の本流ブランチへマージ（`gh pr merge` または対応する `git merge`）してはならない
    - 理由: 人間がPRを確認しなくなり、品質保証の最終防衛ラインが崩壊するため
    - Phase 5 では「マージ待ち」状態で停止し、人間の操作を待つ
+   - ローカル作業ブランチへの `git merge`（作業ブランチに main を取り込む等）や `git merge-base` 等の読み取り系コマンドは許容する
 3. **Critical/Majorを放置しない**（Phase 4A/4Bで最大3回ループ）
 4. **PRコメント投稿必須**（コンソール出力だけでなく、必ずPRにもコメント投稿すること）
 5. **内部タスク番号に`#`使用禁止**（GitHub誤リンク防止）

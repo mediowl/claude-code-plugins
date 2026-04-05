@@ -29,7 +29,7 @@ SETTINGS_FILES+=("${HOME}/.claude/settings.json")
 # hooks.json に定義された hooks を識別するための文字列
 HOOK_CHECKS=(
   "check-update.sh:SessionStart:自動更新（セッション開始時にプラグインの新バージョンを検出）"
-  "guard-dangerous-commands.sh:PreToolUse:危険コマンドガード（rm -rf, git reset --hard 等をブロック）"
+  "guard-dangerous-commands.sh:PreToolUse:危険コマンドガード（rm -rf, DROP TABLE, git add -A 等をブロック）"
 )
 
 # --- 検査ロジック ---
