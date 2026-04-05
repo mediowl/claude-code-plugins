@@ -32,51 +32,6 @@ claude plugin install piwf@mediowl-plugins --scope user
 claude plugin list
 ```
 
-### 5. Hooks のセットアップ
-
-piwf プラグインは以下の hooks を提供していますが、Claude Code はプラグインの hooks を自動登録しません。
-手動で `settings.json` に追記する必要があります。
-
-| Hook | スクリプト | 機能 |
-|------|-----------|------|
-| SessionStart | `check-update.sh` | プラグインの自動更新チェック（24h キャッシュ付き） |
-| PreToolUse | `guard-dangerous-commands.sh` | 危険コマンド（rm -rf, git push --force, git add -A 等）のブロック |
-
-プロジェクトの `.claude/settings.json`（またはユーザーの `~/.claude/settings.json`）に以下を追記してください:
-
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugin-sources/mediowl-plugins/piwf/hooks/check-update.sh piwf mediowl-plugins mediowl/claude-code-plugins",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugin-sources/mediowl-plugins/piwf/hooks/guard-dangerous-commands.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-> **注意**: 既に `settings.json` に `hooks` セクションがある場合は、既存の設定とマージしてください。上記をそのまま上書きすると、他の hooks 設定が消えます。
-
 ## 更新
 
 プラグインのソースコードが更新された場合:

@@ -53,7 +53,6 @@ Phase 5: 計画承認 → workflow-pr連携確認
 2. `gh issue view <number> --json title,body,comments` でIssue情報取得（本文+コメント）
 3. 画像URLがあれば認証付きcurlでダウンロード
 4. Task ツール呼び出し時、モデル設定に従い `model` パラメータを指定
-5. hooks 登録チェック: `bash "${CLAUDE_PLUGIN_ROOT}/hooks/check-hooks-registration.sh"` を実行し、出力があればユーザーに表示する（スキルの実行はブロックしない）
 
 **詳細仕様**: `../../docs/config-loader.md` および `../../docs/issue-context-guide.md` を参照
 

@@ -49,7 +49,6 @@ Phase 3: 最終レポート（成功/失敗テーブル + PR リンク）
 
 1. `.claude/dbz-workflow.config.md` を読み込む（なければフォールバック）
 2. 各Issueの情報を `gh issue view <number> --json title,body,comments` で取得
-3. hooks 登録チェック: `bash "${CLAUDE_PLUGIN_ROOT}/hooks/check-hooks-registration.sh"` を実行し、出力があればユーザーに表示する（スキルの実行はブロックしない）
 
 **詳細仕様**: `../../docs/config-loader.md` および `../../docs/issue-context-guide.md` を参照
 

@@ -5,68 +5,6 @@ description: PIWFプロジェクトの振り返り（ゲート検出問題・定
 
 # /piwf-retro -- PIWF 振り返りスキル
 
-## Hooks 登録チェック（スキル実行開始時に必ず実施）
-
-このプラグインは以下の hooks を提供しているが、Claude Code はプラグインの hooks を自動登録しない。
-スキル実行開始時に、以下の手順で hooks が登録済みか確認せよ。
-
-### チェック手順
-
-1. 以下のファイルを順に確認する:
-   - `.claude/settings.json`（プロジェクトスコープ）
-   - `~/.claude/settings.json`（ユーザースコープ）
-2. いずれかのファイルに以下の **両方** が登録されていれば OK:
-   - `hooks.SessionStart` に `check-update.sh` を含むエントリ
-   - `hooks.PreToolUse` に `guard-dangerous-commands.sh` を含むエントリ
-3. 片方でも未登録の場合、以下の案内を表示してからワークフローを続行せよ:
-
-```
-[注意] piwf プラグインの hooks が settings.json に登録されていません。
-以下の機能が無効になっています:
-
-- SessionStart hook: プラグインの自動更新チェック
-- PreToolUse hook: 危険コマンド（rm -rf, git push --force 等）のブロック
-
-セットアップ方法:
-プロジェクトの .claude/settings.json（またはユーザーの ~/.claude/settings.json）に以下を追記してください:
-
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugin-sources/mediowl-plugins/piwf/hooks/check-update.sh piwf mediowl-plugins mediowl/claude-code-plugins",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugin-sources/mediowl-plugins/piwf/hooks/guard-dangerous-commands.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
-}
-
-詳細は piwf の README.md「Hooks のセットアップ」を参照してください。
-```
-
-### 注意事項
-
-- hooks が未登録でもワークフロー自体は実行可能。案内表示後にブロックせず続行すること
-- 既に登録済みの場合は何も表示せずそのまま進めること
-
 ## このスキルの使い方
 
 ユーザーが「振り返り」「retro」「piwf-retro」に言及したら、このスキルに従って行動せよ。
